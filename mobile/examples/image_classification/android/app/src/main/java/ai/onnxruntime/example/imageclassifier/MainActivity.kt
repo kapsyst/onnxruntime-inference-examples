@@ -5,6 +5,7 @@ package ai.onnxruntime.example.imageclassifier
 
 import ai.onnxruntime.*
 import ai.onnxruntime.example.imageclassifier.databinding.ActivityMainBinding
+import ai.onnxruntime.providers.NNAPIFlags
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -20,6 +21,9 @@ import java.lang.Runnable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+import java.util.EnumSet
+import java.util.HashMap
+
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
@@ -28,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
     private var ortEnv: OrtEnvironment? = null
+    private var ortSessionOptions: OrtSession.SessionOptions? = null
     private var imageCapture: ImageCapture? = null
     private var imageAnalysis: ImageAnalysis? = null
     private var enableQuantizedModel: Boolean = false
@@ -37,7 +42,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        ortEnv = OrtEnvironment.getEnvironment()
+        ortEnv = OrtEnvironment.getEnvironment(OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE)
+
+        Log.e(TAG, OrtEnvironment.getEnvironment().version)
+
+        ortSessionOptions = OrtSession.SessionOptions()
         // Request Camera permission
         if (allPermissionsGranted()) {
             startCamera()
@@ -71,7 +80,7 @@ class MainActivity : AppCompatActivity() {
                     .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                     .build()
 
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
             imageAnalysis = ImageAnalysis.Builder()
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -123,23 +132,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateUI(result: Result) {
-        if (result.detectedScore.isEmpty())
-            return
+//        if (result.detectedScore.isEmpty())
+//            return
 
         runOnUiThread {
-            binding.percentMeter.progress = (result.detectedScore[0] * 100).toInt()
-            binding.detectedItem1.text = labelData[result.detectedIndices[0]]
-            binding.detectedItemValue1.text = "%.2f%%".format(result.detectedScore[0] * 100)
-
-            if (result.detectedIndices.size > 1) {
-                binding.detectedItem2.text = labelData[result.detectedIndices[1]]
-                binding.detectedItemValue2.text = "%.2f%%".format(result.detectedScore[1] * 100)
-            }
-
-            if (result.detectedIndices.size > 2) {
-                binding.detectedItem3.text = labelData[result.detectedIndices[2]]
-                binding.detectedItemValue3.text = "%.2f%%".format(result.detectedScore[2] * 100)
-            }
+            binding.imageView.setImageBitmap(result.bitmap)
+//            binding.percentMeter.progress = (result.detectedScore[0] * 100).toInt()
+//            binding.detectedItem1.text = labelData[result.detectedIndices[0]]
+//            binding.detectedItemValue1.text = "%.2f%%".format(result.detectedScore[0] * 100)
+//
+//            if (result.detectedIndices.size > 1) {
+//                binding.detectedItem2.text = labelData[result.detectedIndices[1]]
+//                binding.detectedItemValue2.text = "%.2f%%".format(result.detectedScore[1] * 100)
+//            }
+//
+//            if (result.detectedIndices.size > 2) {
+//                binding.detectedItem3.text = labelData[result.detectedIndices[2]]
+//                binding.detectedItemValue3.text = "%.2f%%".format(result.detectedScore[2] * 100)
+//            }
 
             binding.inferenceTimeValue.text = result.processTimeMs.toString() + "ms"
         }
@@ -152,14 +162,48 @@ class MainActivity : AppCompatActivity() {
 
     // Read ort model into a ByteArray, run in background
     private suspend fun readModel(): ByteArray = withContext(Dispatchers.IO) {
-        val modelID =
-            if (enableQuantizedModel) R.raw.mobilenetv2_int8 else R.raw.mobilenetv2_fp32
+        //val modelID =
+        //    if (enableQuantizedModel) R.raw.mobilenetv2_int8 else R.raw.mobilenetv2_fp32
+
+        val modelID = R.raw.face_landmark_010_opset10
+        //val modelID = R.raw.face_landmark_010_opset10_mixed_prec
+        //val modelID = R.raw.face_landmark_010_opset10_fp16
+        //val modelID = R.raw.segmask_010
+        //val modelID = R.raw.landmark010_2
         resources.openRawResource(modelID).readBytes()
     }
 
-    // Create a new ORT session in background
+    // // Create a new ORT session in background
+    // private suspend fun createOrtSession(): OrtSession? = withContext(Dispatchers.Default) {
+    //    ortEnv?.createSession(readModel())
+    // }
+
     private suspend fun createOrtSession(): OrtSession? = withContext(Dispatchers.Default) {
-        ortEnv?.createSession(readModel())
+        val sessionOptions = OrtSession.SessionOptions()
+        sessionOptions.setExecutionMode(OrtSession.SessionOptions.ExecutionMode.SEQUENTIAL)
+
+// val emptyFlags = EnumSet.noneOf(NNAPIFlags::class.java)
+// sessionOptions.addNnapi(emptyFlags)
+
+        val nnapiFlags = EnumSet.of(NNAPIFlags.CPU_DISABLED, NNAPIFlags.USE_FP16)
+        sessionOptions.addNnapi(nnapiFlags)
+
+        //val nnapiFlags = EnumSet.of(NNAPIFlags.CPU_DISABLED)
+        //sessionOptions.addNnapi(nnapiFlags)
+
+//val nnapiFlags = EnumSet.noneOf(NNAPIFlags::class.java)
+        //val nnapiFlags = EnumSet.of(NNAPIFlags.CPU_DISABLED)
+        //sessionOptions.addNnapi(nnapiFlags)
+     //   sessionOptions.setOptimizationLevel(OrtSession.SessionOptions.OptLevel.NO_OPT)
+
+//        val nnapiFlags = EnumSet.of(NNAPIFlags.CPU_ONLY)
+//        sessionOptions.addNnapi(nnapiFlags)
+
+        //val xnnpackFlags: Map<String, String> = mapOf( "intra_op_num_threads" to "1")
+        //sessionOptions.addXnnpack(xnnpackFlags)
+
+        var modelBytes = readModel()
+        ortEnv?.createSession(modelBytes, sessionOptions)
     }
 
     // Create a new ORT session and then change the ImageAnalysis.Analyzer

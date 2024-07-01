@@ -23,8 +23,8 @@ import java.nio.FloatBuffer
 
 const val DIM_BATCH_SIZE = 1;
 const val DIM_PIXEL_SIZE = 3;
-const val IMAGE_SIZE_X = 224;
-const val IMAGE_SIZE_Y = 224;
+const val IMAGE_SIZE_X = 256;
+const val IMAGE_SIZE_Y = 256;
 
 fun preProcess(bitmap: Bitmap): FloatBuffer {
     val imgData = FloatBuffer.allocate(
@@ -41,9 +41,15 @@ fun preProcess(bitmap: Bitmap): FloatBuffer {
         for (j in 0..IMAGE_SIZE_Y - 1) {
             val idx = IMAGE_SIZE_Y * i + j
             val pixelValue = bmpData[idx]
-            imgData.put(idx, (((pixelValue shr 16 and 0xFF) / 255f - 0.485f) / 0.229f))
-            imgData.put(idx + stride, (((pixelValue shr 8 and 0xFF) / 255f - 0.456f) / 0.224f))
-            imgData.put(idx + stride * 2, (((pixelValue and 0xFF) / 255f - 0.406f) / 0.225f))
+            // imgData.put(idx, (((pixelValue shr 16 and 0xFF) / 255f - 0.485f) / 0.229f))
+            // imgData.put(idx + stride, (((pixelValue shr 8 and 0xFF) / 255f - 0.456f) / 0.224f))
+            // imgData.put(idx + stride * 2, (((pixelValue and 0xFF) / 255f - 0.406f) / 0.225f))
+            imgData.put(idx, (pixelValue shr 16 and 0xFF) / 1f)
+            imgData.put(idx + stride, (pixelValue shr 8 and 0xFF) / 1f)
+            imgData.put(idx + stride * 2, (pixelValue and 0xFF) / 1f)
+            // imgData.put(idx, ((pixelValue shr 16 and 0xFF) / 255f)*65536f - 32768f)
+            // imgData.put(idx + stride, ((pixelValue shr 8 and 0xFF) / 255f)*65536f - 32768f)
+            // imgData.put(idx + stride * 2, ((pixelValue and 0xFF) / 255f)*65536f - 32768f)
         }
     }
 

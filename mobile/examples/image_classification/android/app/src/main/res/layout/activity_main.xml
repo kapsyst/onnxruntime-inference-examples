@@ -10,15 +10,19 @@
         android:id="@+id/viewFinder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:alpha="0"
+        app:layout_constraintTop_toTopOf="parent"
         app:scaleType="fitStart"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:layout_editor_absoluteX="-194dp">
+
+    </androidx.camera.view.PreviewView>
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/semi_transparent_white">
+        android:background="@color/semi_transparent_white"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -26,28 +30,38 @@
             android:src="@drawable/logo_36" />
     </androidx.appcompat.widget.Toolbar>
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#8BC34A"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/mylinear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:orientation="vertical"
         android:background="@color/white"
-        android:paddingTop="10dp"
+        android:orientation="vertical"
         android:paddingLeft="10dp"
+        android:paddingTop="10dp"
         android:paddingRight="10dp"
-        android:paddingBottom="10dp">
+        android:paddingBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ProgressBar
-            android:layout_margin="16dp"
-            android:layout_width="match_parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:id="@+id/percentMeter"
             style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:progress="0" />
+            android:layout_margin="16dp"
+            android:progress="0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -59,8 +73,8 @@
                 android:id="@+id/detected_item_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
                 android:text="Detected Item 1"
+                android:textColor="@android:color/black"
                 android:textSize="16sp" />
 
             <TextView
@@ -82,8 +96,8 @@
                 android:id="@+id/detected_item_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/darker_gray"
                 android:text="Detected Item 2"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
 
             <TextView
@@ -105,8 +119,8 @@
                 android:id="@+id/detected_item_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/darker_gray"
                 android:text="Detected Item 3"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
 
             <TextView
@@ -127,8 +141,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
                 android:text="Inference Time"
+                android:textColor="@android:color/black"
                 android:textSize="16sp" />
 
             <TextView
@@ -149,16 +163,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
                 android:text="Enable Quantized Model"
+                android:textColor="@android:color/black"
                 android:textSize="16sp" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/enable_quantizedmodel_toggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="right"
-                android:checked="false" />
+                android:checked="false"
+                android:gravity="right" />
         </LinearLayout>
 
     </LinearLayout>
