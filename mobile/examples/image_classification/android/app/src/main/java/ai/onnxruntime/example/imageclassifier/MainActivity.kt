@@ -43,8 +43,11 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
         ortEnv = OrtEnvironment.getEnvironment(OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE)
+        //ortEnv = OrtEnvironment.getEnvironment()
 
         Log.e(TAG, OrtEnvironment.getEnvironment().version)
+
+        Log.d(TAG, "Hello world!")
 
         ortSessionOptions = OrtSession.SessionOptions()
         // Request Camera permission
@@ -165,7 +168,9 @@ class MainActivity : AppCompatActivity() {
         //val modelID =
         //    if (enableQuantizedModel) R.raw.mobilenetv2_int8 else R.raw.mobilenetv2_fp32
 
-        val modelID = R.raw.face_landmark_010_opset10
+        //val modelID = R.raw.landmark_only_dirty
+        //val modelID = R.raw.face_landmark_010_opset10_tran
+        val modelID = R.raw.lm_hardswish_opset_15
         //val modelID = R.raw.face_landmark_010_opset10_mixed_prec
         //val modelID = R.raw.face_landmark_010_opset10_fp16
         //val modelID = R.raw.segmask_010
@@ -182,8 +187,11 @@ class MainActivity : AppCompatActivity() {
         val sessionOptions = OrtSession.SessionOptions()
         sessionOptions.setExecutionMode(OrtSession.SessionOptions.ExecutionMode.SEQUENTIAL)
 
-// val emptyFlags = EnumSet.noneOf(NNAPIFlags::class.java)
-// sessionOptions.addNnapi(emptyFlags)
+       // val emptyFlags = EnumSet.noneOf(NNAPIFlags::class.java)
+       // sessionOptions.addNnapi(emptyFlags)
+
+       // val nnapiFlags = EnumSet.of(NNAPIFlags.CPU_ONLY)
+       // sessionOptions.addNnapi(nnapiFlags)
 
         val nnapiFlags = EnumSet.of(NNAPIFlags.CPU_DISABLED, NNAPIFlags.USE_FP16)
         sessionOptions.addNnapi(nnapiFlags)

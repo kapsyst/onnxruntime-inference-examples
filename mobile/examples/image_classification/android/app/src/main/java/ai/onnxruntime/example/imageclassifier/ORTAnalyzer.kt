@@ -118,10 +118,10 @@ internal class ORTAnalyzer(
                             style = Paint.Style.FILL
                         }
                         for (i in 0..105) {
-                            //val x = rawOutput1[i][0]
-                            //val y = rawOutput1[i][1]
-                            val x = ((rawOutput1[i][0] + 32768.0f)/65536.0f)*256.0f
-                            val y = ((rawOutput1[i][1] + 32768.0f)/65536.0f)*256.0f
+                            val x = rawOutput1[i][0]
+                            val y = rawOutput1[i][1]
+                            // val x = ((rawOutput1[i][0] + 32768.0f)/65536.0f)*256.0f
+                            // val y = ((rawOutput1[i][1] + 32768.0f)/65536.0f)*256.0f
                             canvas.drawCircle(x, y, 2.0f, paint)
                         }
                         /// val probabilities = softMax(rawOutput)
